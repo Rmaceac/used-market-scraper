@@ -19,7 +19,8 @@ async function searchWebsites(city, limit, item) {
     if (craigslistCount >= limit) return; // Limit the number of results per website
     const title = craigslist$(element).find('.result-title.hdrlnk').text().trim();
     const price = craigslist$(element).find('.result-price').text().trim();
-    results.push({ title, price, website: 'Craigslist' });
+    const link = craigslist$(element).find('.result-title.hdrlnk').attr('href');
+    results.push({ title, price, link, website: 'Craigslist' });
     craigslistCount++;
   });
 
@@ -35,7 +36,8 @@ async function searchWebsites(city, limit, item) {
     if (kijijiCount >= limit) return; // Limit the number of results per website
     const title = kijiji$(element).find('.title').text().trim();
     const price = kijiji$(element).find('.price').text().trim();
-    results.push({ title, price, website: 'Kijiji' });
+    const link = 'https://www.kijiji.ca' + kijiji$(element).find('.title').attr('href');
+    results.push({ title, price, link, website: 'Kijiji' });
     kijijiCount++;
   });
 
@@ -51,7 +53,8 @@ async function searchWebsites(city, limit, item) {
     if (usedCount >= limit) return; // Limit the number of results per website
     const title = used$(element).find('.listing-title').text().trim();
     const price = used$(element).find('.price').text().trim();
-    results.push({ title, price, website: 'Used.ca' });
+    const link = 'https://www.used' + city + '.com' + used$(element).find('.listing-title').attr('href');
+    results.push({ title, price, link, website: 'Used.ca' });
     usedCount++;
   });
 
@@ -74,6 +77,7 @@ if (!city || !limit || !item) {
         console.log(`Website: ${result.website}`);
         console.log(`Title: ${result.title}`);
         console.log(`Price: ${result.price}`);
+        console.log(`Link: ${result.link}`);
         console.log('---');
       });
     })

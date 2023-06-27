@@ -4,8 +4,11 @@ const cheerio = require('cheerio');
 async function searchWebsites(city, limit, item) {
   const results = [];
 
+  // Replace spaces in the item with '+' for URL encoding
+  const encodedItem = item.replace(/\s/g, '+');
+
   // Craigslist.org
-  const craigslistUrl = `https://${city}.craigslist.org/search/sss?query=${item}&sort=date`;
+  const craigslistUrl = `https://${city}.craigslist.org/search/sss?query=${encodedItem}&sort=date`;
   const craigslistResponse = await axios.get(craigslistUrl);
   const craigslistHtml = craigslistResponse.data;
   const craigslist$ = cheerio.load(craigslistHtml);
@@ -19,7 +22,7 @@ async function searchWebsites(city, limit, item) {
   });
 
   // Kijiji.ca
-  const kijijiUrl = `https://www.kijiji.ca/b-${city}/${item}/k0l1700203`;
+  const kijijiUrl = `https://www.kijiji.ca/b-${city}/${encodedItem}/k0l1700203`;
   const kijijiResponse = await axios.get(kijijiUrl);
   const kijijiHtml = kijijiResponse.data;
   const kijiji$ = cheerio.load(kijijiHtml);
@@ -33,7 +36,7 @@ async function searchWebsites(city, limit, item) {
   });
 
   // Used.ca
-  const usedUrl = `https://www.used.${city}.ca/classifieds/all/${item}`;
+  const usedUrl = `https://www.used${city}.com/classifieds/all/${encodedItem}`;
   const usedResponse = await axios.get(usedUrl);
   const usedHtml = usedResponse.data;
   const used$ = cheerio.load(usedHtml);
@@ -52,11 +55,11 @@ async function searchWebsites(city, limit, item) {
 // Get command line arguments
 const city = process.argv[2]; // Specify the city to search
 const limit = parseInt(process.argv[3]); // Number of postings to return from each site
-const item = process.argv[4]; // Item you are looking for
+const item = process.argv.slice(4).join(' '); // Item you are looking for (multi-word support)
 
 if (!city || !limit || !item) {
   console.log('Please provide all three parameters: city, limit, and item.');
-  console.log('Example: node scraper.js vancouver 5 laptop');
+  console.log('Example: node scraper.js vancouver 5 water bottle');
 } else {
   searchWebsites(city, limit, item)
     .then((results) => {

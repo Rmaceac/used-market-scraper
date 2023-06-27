@@ -14,11 +14,13 @@ async function searchWebsites(city, limit, item) {
   const craigslist$ = cheerio.load(craigslistHtml);
   const craigslistListings = craigslist$('.result-row');
 
+  let craigslistCount = 0; // Counter for Craigslist results
   craigslistListings.each((index, element) => {
-    if (index >= limit) return; // Limit the number of results
+    if (craigslistCount >= limit) return; // Limit the number of results per website
     const title = craigslist$(element).find('.result-title.hdrlnk').text().trim();
     const price = craigslist$(element).find('.result-price').text().trim();
     results.push({ title, price, website: 'Craigslist' });
+    craigslistCount++;
   });
 
   // Kijiji.ca
@@ -28,11 +30,13 @@ async function searchWebsites(city, limit, item) {
   const kijiji$ = cheerio.load(kijijiHtml);
   const kijijiListings = kijiji$('.regular-ad');
 
+  let kijijiCount = 0; // Counter for Kijiji results
   kijijiListings.each((index, element) => {
-    if (index >= limit) return; // Limit the number of results
+    if (kijijiCount >= limit) return; // Limit the number of results per website
     const title = kijiji$(element).find('.title').text().trim();
     const price = kijiji$(element).find('.price').text().trim();
     results.push({ title, price, website: 'Kijiji' });
+    kijijiCount++;
   });
 
   // Used.ca
@@ -42,11 +46,13 @@ async function searchWebsites(city, limit, item) {
   const used$ = cheerio.load(usedHtml);
   const usedListings = used$('.listing');
 
+  let usedCount = 0; // Counter for Used.ca results
   usedListings.each((index, element) => {
-    if (index >= limit) return; // Limit the number of results
+    if (usedCount >= limit) return; // Limit the number of results per website
     const title = used$(element).find('.listing-title').text().trim();
     const price = used$(element).find('.price').text().trim();
     results.push({ title, price, website: 'Used.ca' });
+    usedCount++;
   });
 
   return results;
@@ -59,7 +65,7 @@ const item = process.argv.slice(4).join(' '); // Item you are looking for (multi
 
 if (!city || !limit || !item) {
   console.log('Please provide all three parameters: city, limit, and item.');
-  console.log('Example: node scraper.js vancouver 5 water bottle');
+  console.log('Example: node scraper.js vancouver 3 water bottle');
 } else {
   searchWebsites(city, limit, item)
     .then((results) => {
